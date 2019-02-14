@@ -1,0 +1,263 @@
+SQL> clear screen
+
+SQL> CREATE PACKAGE demo3
+  2  AS
+  3  	TYPE details IS REF CURSOR;
+  4  	PROCEDURE viewDept(deptCur IN OUT details);
+  5  END demo3;
+  6  /
+
+Package created.
+
+SQL> CREATE PACKAGE BODY demo3
+  2  AS
+  3  	PROCEDURE viewDept(deptCur IN OUT details) IS
+  4  	BEGIN
+  5  		OPEN deptCur FOR sELECT * FROM dept;
+  6  	END  viewDept;
+  7  END demo3;
+  8  /
+
+Package body created.
+
+SQL> VARIABLE v REFCURSOR
+SQL> set autoprint on
+SQL> exec demo3.viewDept(:v);
+
+PL/SQL procedure successfully completed.
+
+
+    DEPTNO DNAME          LOC                                                   
+---------- -------------- -------------                                         
+        14 Test           CHN                                                   
+        22 HR             CHN                                                   
+       778 nb             gj                                                    
+        45 gh             hh                                                    
+        10 ACCOUNTING     NEWYORK                                               
+        20 RESEARCH       DALLAS                                                
+        30 SALES          CHICAGO                                               
+        40 OPERATIONS     BOSTON                                                
+        33 dd             dd                                                    
+        83 ee                                                                   
+        84 ee                                                                   
+
+    DEPTNO DNAME          LOC                                                   
+---------- -------------- -------------                                         
+        77 tt             uu                                                    
+        66 ee             gg                                                    
+        12 s              r                                                     
+         1 ee             ff                                                    
+         2 sdf            fsd                                                   
+
+16 rows selected.
+
+SQL> desc dept;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ DEPTNO                                    NOT NULL NUMBER(4)
+ DNAME                                              VARCHAR2(14)
+ LOC                                                VARCHAR2(13)
+
+SQL> INSERT INTO dept VALUES(NULL,'ee','rr');
+INSERT INTO dept VALUES(NULL,'ee','rr')
+                        *
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("RATHNA"."DEPT"."DEPTNO") 
+
+
+
+SQL> desc errorlog
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ ERRORNO                                            NUMBER
+ DESCRIPTION                                        VARCHAR2(80)
+ ERRORDATE                                          DATE
+
+SQL> BEGIN
+  2     INSERT INTO dept VALUES(44,'ee','rr');
+  3     INSERT INTO dept VALUES(NULL,'ee','rr');
+  4  EXCEPTION
+  5     WHEN OTHERS THEN
+  6             INSERT INTO errorlog VALUES(33,'dff',sysdate);
+  7  END;
+  8  /
+
+PL/SQL procedure successfully completed.
+
+SQL> set serveroutput on
+SQL> /
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from dept WHERE deptno=44;
+
+    DEPTNO DNAME          LOC                                                   
+---------- -------------- -------------                                         
+        44 ee             rr                                                    
+
+SQL> select * from errorlog WHERE errorno=44;
+
+no rows selected
+
+SQL> select * from errorlog WHERE errorno=33;
+
+   ERRORNO                                                                      
+----------                                                                      
+DESCRIPTION                                                                     
+--------------------------------------------------------------------------------
+ERRORDATE                                                                       
+---------                                                                       
+        33                                                                      
+dff                                                                             
+27-AUG-14                                                                       
+                                                                                
+        33                                                                      
+dff                                                                             
+27-AUG-14                                                                       
+
+   ERRORNO                                                                      
+----------                                                                      
+DESCRIPTION                                                                     
+--------------------------------------------------------------------------------
+ERRORDATE                                                                       
+---------                                                                       
+                                                                                
+
+SQL> BEGIN
+  2     INSERT INTO dept VALUES(44,'ee','rr');
+  3     INSERT INTO dept VALUES(NULL,'ee','rr');
+  4  EXCEPTION
+  5     WHEN OTHERS THEN
+  6             INSERT INTO errorlog VALUES(33,'dff',sysdate);
+  7  	   rollback;
+  8  END;
+  9  /
+
+PL/SQL procedure successfully completed.
+
+SQL> BEGIN
+  2     INSERT INTO dept VALUES(54,'ee','rr');
+  3     INSERT INTO dept VALUES(NULL,'ee','rr');
+  4  EXCEPTION
+  5     WHEN OTHERS THEN
+  6             INSERT INTO errorlog VALUES(34,'dff',sysdate);
+  7  	   rollback;
+  8  END;
+  9  /
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from dept WHERE deptno=54;
+
+no rows selected
+
+SQL> select * from errorlog WHERE errorno=34;
+
+no rows selected
+
+SQL> create sequence errorid;
+
+Sequence created.
+
+
+SQL> CREATE PROCEDURE logerror2
+  2  AS
+  3  BEGIN
+  4     INSERT INTO errorlog VALUES(errorid.nextval,'dff',sysdate);
+  5  END;
+  6  /
+
+Procedure created.
+
+SQL> BEGIN
+  2     INSERT INTO dept VALUES(54,'ee','rr');
+  3     INSERT INTO dept VALUES(NULL,'ee','rr');
+  4  EXCEPTION
+  5     WHEN OTHERS THEN
+  6            logerror2;
+  7  	  rollback;
+  8  END;
+  9  /
+
+PL/SQL procedure successfully completed.
+
+SQL> SELECT errorno FROM errorlog WHERE description='dff';
+
+no rows selected
+
+SQL> SELECT * FROM dept WHERE deptno=54;
+
+no rows selected
+
+SQL>  CREATE OR REPLACE PROCEDURE logerror2
+  2   AS
+  3   PRAGMA AUTONOMOUS_TRANSACTION;
+  4   BEGIN
+  5      INSERT INTO errorlog VALUES(errorid.nextval,'dff',sysdate);
+  6      COMMIT;
+  7   END;
+  8  /
+
+Procedure created.
+
+SQL> BEGIN
+  2     INSERT INTO dept VALUES(54,'ee','rr');
+  3     INSERT INTO dept VALUES(NULL,'ee','rr');
+  4  EXCEPTION
+  5     WHEN OTHERS THEN
+  6            logerror2;
+  7  	  rollback;
+  8  END;
+  9  /
+
+PL/SQL procedure successfully completed.
+
+SQL> SELECT * FROM dept WHERE deptno=54;
+
+no rows selected
+
+SQL> SELECT errorno FROM errorlog WHERE description='dff';
+
+   ERRORNO                                                                      
+----------                                                                      
+         2                                                                      
+
+SQL> CREATE OR REPLACE PROCEDURE spSum(num1 IN NUMBER, num2 IN NUMBER, num3 IN NUMBER)
+  2  AS
+  3  	result NUMBER;
+  4  BEGIN
+  5  	result:=num1+num2+num3;
+  6  	DBMS_OUTPUT.PUT_LINE(result);
+  7  END;
+  8  /
+
+Procedure created.
+
+SQL> exec spSum(5,4,6);
+15                                                                              
+
+PL/SQL procedure successfully completed.
+
+SQL> exec spSum(num2=>4,num3=>6,num1=>5);
+15                                                                              
+
+PL/SQL procedure successfully completed.
+
+SQL> exec spSum(5,num2=>4,num3=>6);
+15                                                                              
+
+PL/SQL procedure successfully completed.
+
+SQL> exec spSum(5,num2=>4,6);
+BEGIN spSum(5,num2=>4,6); END;
+
+                      *
+ERROR at line 1:
+ORA-06550: line 1, column 23: 
+PLS-00312: a positional parameter association may not follow a named 
+association 
+ORA-06550: line 1, column 7: 
+PL/SQL: Statement ignored 
+
+
+SQL> spool off

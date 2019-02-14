@@ -1,0 +1,137 @@
+SQL> clear screen
+
+SQL> CREATE TRIGGER trgdemo1
+  2  AFTER INSERT ON dept
+  3  BEGIN
+  4  	DBMS_OUTPUT.PUT_LINE('Trigger fired');
+  5  END;
+  6  /
+
+Trigger created.
+
+SQL> INSERT INTO dept VALUES(32,'ff','tt');
+Trigger fired                                                                   
+
+1 row created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1   CREATE OR REPLACE TRIGGER trgdemo1
+  2   AFTER INSERT ON dept
+  3   BEGIN
+  4      DBMS_OUTPUT.PUT_LINE('Trigger fired');
+  5*  END;
+SQL> /
+
+Trigger created.
+
+SQL> CREATE OR REPLACE TRIGGER trgdemo2
+  2  AFTER UPDATE OF sal ON employee
+  3  FOR EACH ROW
+  4  BEGIN
+  5  	DBMS_OUTPUT.PUT_LINE('Trigger fired');
+  6  END;
+  7  /
+
+Trigger created.
+
+SQL> UPDATE employee SET sal=sal+.2*sal;
+Trigger fired                                                                   
+Trigger fired                                                                   
+Trigger fired                                                                   
+Trigger fired                                                                   
+Trigger fired                                                                   
+Trigger fired                                                                   
+Trigger fired                                                                   
+Trigger fired                                                                   
+Trigger fired                                                                   
+
+9 rows updated.
+
+SQL> CREATE OR REPLACE TRIGGER trgdemo2
+  2  AFTER UPDATE OF sal ON employee
+  3  BEGIN
+  4  	DBMS_OUTPUT.PUT_LINE('Trigger fired');
+  5  END;
+  6  /
+
+Trigger created.
+
+SQL> UPDATE employee SET sal=sal+.2*sal;
+Trigger fired                                                                   
+
+9 rows updated.
+
+SQL> CREATE OR REPLACE TRIGGER demo3
+  2  AFTER INSERT OR UPDATE OR DELETE ON dept
+  3  BEGIN
+  4  	DBMS_OUTPUT.PUT_LINE('trigger fired2');
+  5  END;
+  6  /
+
+Trigger created.
+
+SQL> INSERT INTO dept VALUES(34,'dd','yy');
+trigger fired2                                                                  
+Trigger fired                                                                   
+
+1 row created.
+
+SQL> ALTER TRIGGER trgdemo1 DISABLE;
+
+Trigger altered.
+
+SQL> INSERT INTO dept VALUES(39,'dd','yy');
+trigger fired2                                                                  
+
+1 row created.
+
+SQL> ALTER TRIGGER trgdemo1 ENABLE;
+
+Trigger altered.
+
+SQL> INSERT INTO dept VALUES(37,'dd','yy');
+trigger fired2                                                                  
+Trigger fired                                                                   
+
+1 row created.
+
+SQL> DROP TRIGGER trgdemo1;
+
+Trigger dropped.
+
+SQL>  CREATE OR REPLACE TRIGGER trgdemo2
+  2   AFTER UPDATE OF sal ON employee
+  3   FOR EACH ROW
+  4   BEGIN
+  5      DBMS_OUTPUT.PUT_LINE('Trigger fired');
+  6      DBMS_OUTPUT.PUT_LINE('Old Salary'||:old.sal||' Revised Salary '||:new.sal);
+  7   END;
+  8   /
+
+Trigger created.
+
+SQL> UPDATE employee SET sal=sal+300;
+Trigger fired                                                                   
+Old Salary7632 Revised Salary 7932                                              
+Trigger fired                                                                   
+Old Salary7776 Revised Salary 8076                                              
+Trigger fired                                                                   
+Old Salary7776 Revised Salary 8076                                              
+Trigger fired                                                                   
+Old Salary7776 Revised Salary 8076                                              
+Trigger fired                                                                   
+Old Salary2736 Revised Salary 3036                                              
+Trigger fired                                                                   
+Old Salary2232 Revised Salary 2532                                              
+Trigger fired                                                                   
+Old Salary4716 Revised Salary 5016                                              
+Trigger fired                                                                   
+Old Salary2232 Revised Salary 2532                                              
+Trigger fired                                                                   
+Old Salary4752 Revised Salary 5052                                              
+
+9 rows updated.
+
+SQL> spool off

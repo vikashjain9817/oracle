@@ -1,0 +1,66 @@
+SQL> declare
+  2  f utl_file.file_type;-- File Handler
+  3  a varchar2(40);
+  4  begin
+  5  f :=utl_file.fopen('SAMPLE','sample.txt','R');
+  6  utl_file.get_line(f,a);
+  7  utl_file.fclose(f);
+  8  dbms_output.put_line(a);
+  9  end;
+ 10
+ 11  /
+
+PL/SQL procedure successfully completed.
+
+SQL> set serveroutput on
+SQL> /
+Computer Science
+
+PL/SQL procedure successfully completed.
+
+SQL> CREATE TABLE person(id number,
+  2  name varchar2(20),
+  3  photo blob,
+  4  resume clob);
+
+Table created.
+
+SQL> SELECT * fROM person;
+SP2-0678: Column or attribute type can not be displayed by SQL*Plus
+SQL> SELECT id,name FROM person;
+
+no rows selected
+
+SQL> INSERT INTO person VALUES(1,'dd',NULL,'dd');
+
+1 row created.
+
+SQL> INSERT INTO person VALUES(1,'dd',empty_blob(),'dd');
+
+1 row created.
+
+SQL>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

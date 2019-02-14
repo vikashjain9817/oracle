@@ -1,0 +1,151 @@
+SQL> CREATE PACKAGE packdemo1
+  2  AS
+  3  	PROCEDURE spDemo5;
+  4  	FUNCTION fnDemo3 RETURN NUMBER;
+  5  END packdemo1;
+  6  /
+
+Package created.
+
+SQL> CREATE PACKAGE BODY packdemo1
+  2  AS
+  3  	PROCEDURE spDemo5
+  4  	BEGIN
+  5  		DBMS_OUTPUT.PUT_LINe('Procedure in package');
+  6  	END;
+  7  	FUNCTION fnDemo3 RETURN NUMBER IS
+  8  	BEGIN
+  9  		DBMS_OUTPUT.PUT_LINe('Function in package');
+ 10  		RETURN 1;
+ 11  	END fnDemo3;
+ 12  END packdemo1;
+ 13  /
+
+Warning: Package Body created with compilation errors.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  CREATE PACKAGE BODY packdemo1
+  2  AS
+  3  	PROCEDURE spDemo5 Is
+  4  	BEGIN
+  5  		DBMS_OUTPUT.PUT_LINe('Procedure in package');
+  6  	END spDemo5;
+  7  	FUNCTION fnDemo3 RETURN NUMBER IS
+  8  	BEGIN
+  9  		DBMS_OUTPUT.PUT_LINe('Function in package');
+ 10  		RETURN 1;
+ 11  	END fnDemo3;
+ 12* END packdemo1;
+SQL> /
+CREATE PACKAGE BODY packdemo1
+                    *
+ERROR at line 1:
+ORA-00955: name is already used by an existing object 
+
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1  CREATE OR REPLACE PACKAGE BODY packdemo1
+  2  AS
+  3  	PROCEDURE spDemo5 Is
+  4  	BEGIN
+  5  		DBMS_OUTPUT.PUT_LINe('Procedure in package');
+  6  	END spDemo5;
+  7  	FUNCTION fnDemo3 RETURN NUMBER IS
+  8  	BEGIN
+  9  		DBMS_OUTPUT.PUT_LINe('Function in package');
+ 10  		RETURN 1;
+ 11  	END fnDemo3;
+ 12* END packdemo1;
+SQL> /
+
+Package body created.
+
+SQL> exec packdemo1.spDemo5;
+
+PL/SQL procedure successfully completed.
+
+SQL> set serveroutput on
+SQL> exec packdemo1.spDemo5;
+Procedure in package                                                            
+
+PL/SQL procedure successfully completed.
+
+SQL> SELECT packdemo1.fnDemo3 FROM dual;
+
+   FNDEMO3                                                                      
+----------                                                                      
+         1                                                                      
+
+Function in package                                                             
+SQL> CREATE OR REPLACE PACKAGE packdemo2
+  2  AS
+  3     PROCEDURE spDemo5;
+  4     FUNCTION fnDemo3 RETURN NUMBER;
+  5  END packdemo2;
+  6  /
+
+Package created.
+
+SQL>  CREATE OR REPLACE PACKAGE BODY packdemo2
+  2   AS
+  3      PROCEDURE spDemo5 Is
+  4      BEGIN
+  5              DBMS_OUTPUT.PUT_LINe('Procedure in package');
+  6      END spDemo5;
+  7  
+  8   END packdemo2;
+  9  /
+
+Warning: Package Body created with compilation errors.
+
+SQL> show errors
+Errors for PACKAGE BODY PACKDEMO2:
+
+LINE/COL ERROR                                                                  
+-------- -----------------------------------------------------------------      
+4/13     PLS-00323: subprogram or cursor 'FNDEMO3' is declared in a             
+         package specification and must be defined in the package body          
+                                                                                
+SQL> 
+SQL> 
+SQL>  CREATE OR REPLACE PACKAGE BODY packdemo2
+  2   AS
+  3      PROCEDURE spDemo5 Is
+  4      BEGIN
+  5              DBMS_OUTPUT.PUT_LINe('Procedure in package');
+  6      END spDemo5;
+  7      FUNCTION fnDemo3 RETURN NUMBER IS
+  8  BEGIN
+  9          DBMS_OUTPUT.PUT_LINe('Function in package');
+ 10          RETURN 1;
+ 11      END fnDemo3;
+ 12   END packdemo2;
+ 13  /
+
+Package body created.
+
+SQL> CREATE OR REPLACE PACKAGE BODY packdemo2
+  2   AS
+  3      PROCEDURE spDemo5 Is
+  4      BEGIN
+  5              DBMS_OUTPUT.PUT_LINe('Procedure in package');
+  6      END spDemo5;
+  7      PROCEDURE spDemo6 Is
+  8      BEGIN
+  9              DBMS_OUTPUT.PUT_LINe('Procedure2 in package');
+ 10      END spDemo6;
+ 11      FUNCTION fnDemo3 RETURN NUMBER IS
+ 12  BEGIN
+ 13          DBMS_OUTPUT.PUT_LINe('Function in package');
+ 14          RETURN 1;
+ 15      END fnDemo3;
+ 16   END packdemo2;
+ 17  /
+
+Package body created.
+
+SQL> exit

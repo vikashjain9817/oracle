@@ -1,0 +1,14 @@
+DECLARE
+   nCount NUMBER;
+   vcName VARCHAR2(20);
+   vcQuery VARCHAR2(40);
+BEGIN
+   vcName:='&tablename';
+   SELECT count(*) INTO nCount FROM USER_TABLES WHERE table_name=upper(vcName);
+
+   IF nCount>0
+   THEN
+   vcQuery:='Drop table '||vcName;
+   execute immediate vcQuery;
+   END IF;
+END;

@@ -1,0 +1,16 @@
+BEGIN
+   INSERT INTO dept VALUES(54,'ee','rr');
+   INSERT INTO dept VALUES(NULL,'ee','rr');
+EXCEPTION
+   WHEN OTHERS THEN
+          logerror2;
+	  rollback;
+END;
+CREATE OR REPLACE PROCEDURE logerror2
+AS
+PRAGMA AUTONOMOUS_TRANSACTION;
+BEGIN
+    INSERT INTO errorlog VALUES(errorid.nextval,'dff',sysdate);	
+    COMMIT;
+END;
+/
